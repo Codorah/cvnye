@@ -1,7 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { CVData, UserContext, CVAnalysis } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Note: Vite uses import.meta.env to access environment variables on the frontend.
+// Ensure the variable name inside .env is strongly typed and prefixed with VITE_ if needed,
+// but for standard AI Studio setup we'll map or check import.meta.env first, fallback to process.env.
+const apiKey = import.meta.env?.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : '');
+const ai = new GoogleGenAI({ apiKey });
 
 export async function searchJobTrends(domain: string, target: string) {
   const response = await ai.models.generateContent({
@@ -21,7 +25,7 @@ export async function analyzeAndImproveCV(
   trends: string
 ): Promise<CVAnalysis> {
   const cvString = typeof currentCV === 'string' ? currentCV : JSON.stringify(currentCV);
-  
+
   const prompt = `
     You are an expert career coach and professional resume writer.
     
